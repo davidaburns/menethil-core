@@ -6,10 +6,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/davidaburns/menethil-core/internal/cli"
-	"github.com/davidaburns/menethil-core/internal/config"
-	"github.com/davidaburns/menethil-core/internal/logger"
-	"github.com/davidaburns/menethil-core/internal/server"
+	"github.com/davidaburns/menethil-core/internal/common/cli"
+	"github.com/davidaburns/menethil-core/internal/common/config"
+	"github.com/davidaburns/menethil-core/internal/common/logger"
+	"github.com/davidaburns/menethil-core/internal/common/server"
 )
 
 func main() {

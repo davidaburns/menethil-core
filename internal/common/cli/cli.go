@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/davidaburns/menethil-core/internal/errors"
-	"github.com/davidaburns/menethil-core/internal/server"
+	"github.com/davidaburns/menethil-core/internal/common/errors"
+	"github.com/davidaburns/menethil-core/internal/common/server"
 )
 
 type CliArguments struct {
@@ -13,15 +13,8 @@ type CliArguments struct {
 }
 
 func ParseCliArguments(serverType server.ServerType) (*CliArguments, error) {
-	serverStr := func() string {
-		switch serverType {
-		case server.ServerAuth: return "auth"
-		case server.ServerWorld: return "world"
-		default: return ""
-		}
-	}();
-
-	if serverStr == "" {
+	serverStr := serverType.StringShort()
+	if serverStr == "unkown" {
 		return nil, fmt.Errorf("Error parsing cli arguments: %v", errors.ServerTypeUnkown)
 	}
 

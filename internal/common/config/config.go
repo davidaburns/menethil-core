@@ -5,7 +5,9 @@ import (
 )
 
 type ServerConfig interface {
-	ConfigAuth | ConfigWorld
+	GetNetworkConfig() NetworkConfig
+	GetDatabaseConfig() DatabaseConfig
+	GetLoggerConfig() LoggerConfig
 }
 
 func LoadConfig[T ServerConfig](path string) (*T, error) {
