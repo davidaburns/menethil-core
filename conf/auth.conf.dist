@@ -1,0 +1,30 @@
+#######################
+MENETHIL CORE: AUTH SERVER CONFIG
+#######################
+
+#######################
+SECTION: Logger
+#######################
+[logger]
+LogLevelFormat = "| %-6s|"
+LogMessageFormat = "%s
+LogFieldNameFormat = "%s:"
+LogFieldValueFormat = "%s"
+
+#######################
+SECTION: SERVER
+#######################
+[server]
+ListenHost = "0.0.0.0"
+ListenPort = 3724
+
+#######################
+SECTION: DATABASE
+#######################
+[database]
+DatabaseDriver = "postgres"
+DataaseHost = "127.0.0.1"
+DatabasePort = 5432
+DatabaseUsername = ""
+DatabasePassowrd = ""
+DatabaseAuthDatabase = "menethil_auth"
