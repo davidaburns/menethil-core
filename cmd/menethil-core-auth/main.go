@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/davidaburns/menethil-core/internal/cli"
 	"github.com/davidaburns/menethil-core/internal/config"
@@ -21,5 +24,18 @@ func main() {
 	}
 
 	logger := logger.InitializeLogger(&conf.Logger)
-	logger.Info().Msg("Menethil Core: Authentication Server")
+	s, err := server.NewServer(server.ServerAuth, conf, logger)
+	if err != nil {
+		logger.Fatal().Msgf("Failed to create server: %v", err)
+	}
+
+	go func() {
+		s.Start()
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+
+	s.Stop()
 }

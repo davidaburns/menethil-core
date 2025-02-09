@@ -6,7 +6,7 @@ type ConfigWorld struct {
 	Server struct {
 		ListenHost string `ini:"ListenHost"`
 		ListenPort int `ini:"ListenPort"`
-	}
+	} `ini:"server"`
 	Database struct {
 		Driver string `ini:"DatabaseDriver"`
 		Host string `ini:"DatabaseHost"`
@@ -14,7 +14,7 @@ type ConfigWorld struct {
 		Username string `ini:"DatabaseUsername"`
 		Password string `ini:"DatabasePassword"`
 		WorldDatabase string `ini:"DatabaseWorldDatabase"`
-	}
+	} `ini:"database"`
 
-	Logger logger.LoggerConfig
+	Logger logger.LoggerConfig `ini:"logger"`
 }
