@@ -15,32 +15,32 @@ import (
 
 func main() {
 	serverType := server.ServerAuth
-	logger := logger.InitializeLogger()
+	log := logger.InitializeLogger()
 	build := build.NewBuildInfo()
 
-	logger.Info().Msgf("Menethil Core: %v Server", serverType.String())
-	logger.Info().Msgf("Version: %v", build.String())
+	log.Info().Msgf("Menethil Core: %v Server", serverType.String())
+	log.Info().Msgf("Version: %v", build.String())
 
 	args, err := cli.ParseCliArguments(server.ServerAuth)
 	if err != nil {
-		logger.Fatal().Msg("Failed to parse command-line arguments")
+		log.Fatal().Msg("Failed to parse command-line arguments")
 	}
 
 	conf, err := config.LoadConfig(args.ConfigPath)
 	if err != nil {
-		logger.Fatal().Msgf("Failed to load server config file: %v: %v", args.ConfigPath, err)
+		log.Fatal().Msgf("Failed to load server config file: %v: %v", args.ConfigPath, err)
 	}
 
-	serv := auth.NewAuthServer(logger, conf)
-	bootstrap, err := server.NewBootstrapperWithServer(serv, conf, logger)
+	serv := auth.NewAuthServer(log, conf)
+	bootstrap, err := server.NewBootstrapperWithServer(serv, conf, log)
 	if err != nil {
-		logger.Fatal().Msgf("Failed to bootstrap server: %v", err)
+		log.Fatal().Msgf("Failed to bootstrap server: %v", err)
 	}
 
 	go func() {
-		logger.Info().Msg("Starting server")
+		log.Info().Msg("Starting server")
 		if err := bootstrap.Start(); err != nil {
-			logger.Fatal().Msgf("Failed to start server: %v", err)
+			log.Fatal().Msgf("Failed to start server: %v", err)
 		}
 	}()
 

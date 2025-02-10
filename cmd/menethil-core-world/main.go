@@ -31,24 +31,26 @@ func main() {
 		log.Fatal().Msgf("Failed to load server config file: %v", args.ConfigPath)
 	}
 
-	serv := world.NewWorldServer()
+	serv := world.NewWorldServer(log, conf)
 	if serv == nil {
 		log.Fatal().Msg("Failed to create instance of server")
 	}
 
-	s, err := server.NewBootstrapperWithServer(serv, conf, log)
+	bootstrap, err := server.NewBootstrapperWithServer(serv, conf, log)
 	if err != nil {
 		log.Fatal().Msgf("Failed to create server: %v", err)
 	}
 
 	go func() {
 		log.Info().Msg("Starting server")
-		s.Start()
+		if err := bootstrap.Start(); err != nil {
+			log.Fatal().Msgf("Failed to start server: %v", err)
+		}
 	}()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 
-	s.Stop()
+	bootstrap.Stop()
 }
