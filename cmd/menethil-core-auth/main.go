@@ -23,8 +23,8 @@ func main() {
 		panic(fmt.Sprintf("Failed to load server config file: %v", args.ConfigPath))
 	}
 
-	logger := logger.InitializeLogger(&conf.Logger)
-	s, err := server.NewServer(server.ServerAuth, conf, logger)
+	logger := logger.InitializeLogger()
+	s, err := server.NewServerBootstrap(server.ServerAuth, conf, logger)
 	if err != nil {
 		logger.Fatal().Msgf("Failed to create server: %v", err)
 	}

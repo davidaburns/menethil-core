@@ -7,7 +7,6 @@ import (
 type ServerConfig interface {
 	GetNetworkConfig() NetworkConfig
 	GetDatabaseConfig() DatabaseConfig
-	GetLoggerConfig() LoggerConfig
 }
 
 func LoadConfig[T ServerConfig](path string) (*T, error) {
