@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/davidaburns/menethil-core/internal/config"
+	"github.com/davidaburns/menethil-core/internal/process"
 	"github.com/rs/zerolog"
 )
 
@@ -45,6 +46,7 @@ func (s *ServerBootstrap) Start() error {
 	}
 	defer ln.Close()
 
+	process.CreatePIDFile()
 	s.Log.Info().Msgf("Listening on: %v", networkConfig.GetAddress())
 	for {
 		conn, err := ln.Accept()
