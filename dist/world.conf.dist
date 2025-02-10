@@ -3,28 +3,26 @@ MENETHIL CORE: WORLD SERVER CONFIG
 #######################
 
 #######################
-SECTION: Logger
+# SECTION: LOGGER
 #######################
 [logger]
-LogLevelFormat = "| %-6s|"
-LogMessageFormat = "%s
-LogFieldNameFormat = "%s:"
-LogFieldValueFormat = "%s"
+LogLevelFormat = '| %-6s|'
+LogMessageFormat = '%s'
+LogFieldNameFormat = '%s:'
+LogFieldValueFormat = '%s'
 
 #######################
-SECTION: SERVER
+# SECTION: NETWORK
 #######################
-[server]
-ListenHost = "0.0.0.0"
-ListenPort = 8085
+[network]
+ListenHost = '0.0.0.0'
+ListenPort = 3724
 
 #######################
-SECTION: DATABASE
+# SECTION: DATABASE
 #######################
 [database]
-DatabaseDriver = "postgres"
-DataaseHost = "127.0.0.1"
-DatabasePort = 5432
-DatabaseUsername = ""
-DatabasePassowrd = ""
-DatabaseWorldDatabase = "menethil_world"
+DatabaseDriver = 'postgres'
+DatabaseWorldDsn = 'postgres://user:password@localhost:5432/menethil_world'
+DatabaseCharacterDsn = 'postgres://user:password@localhost:5432/menethil_character'
+DatabaseRealmDsn = 'postgres://user:password@localhost:5432/menethil_auth'
