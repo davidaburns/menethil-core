@@ -1,35 +1,48 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/davidaburns/menethil-core/internal/common/cli"
-	"github.com/davidaburns/menethil-core/internal/common/config"
-	"github.com/davidaburns/menethil-core/internal/common/logger"
-	"github.com/davidaburns/menethil-core/internal/common/server"
+	"github.com/davidaburns/menethil-core/build"
+	"github.com/davidaburns/menethil-core/internal/cli"
+	"github.com/davidaburns/menethil-core/internal/config"
+	"github.com/davidaburns/menethil-core/internal/logger"
+	"github.com/davidaburns/menethil-core/internal/server"
+	"github.com/davidaburns/menethil-core/internal/world"
 )
 
 func main() {
-	args, err := cli.ParseCliArguments(server.ServerWorld)
+	serverType := server.ServerWorld
+	log := logger.InitializeLogger()
+	build := build.NewBuildInfo()
+
+	log.Info().Msgf("Menethil Core: %v Server", serverType.String())
+	log.Info().Msgf("Version: %v", build.String())
+
+	args, err := cli.ParseCliArguments(server.ServerAuth)
 	if err != nil {
-		panic("Failed to parse command-line arguments")
+		log.Fatal().Msg("Failed to parse command-line arguments")
 	}
 
-	conf, err := config.LoadConfig[config.ConfigWorld](args.ConfigPath)
+	conf, err := config.LoadConfig(args.ConfigPath)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to load server config file: %v", args.ConfigPath))
+		log.Fatal().Msgf("Failed to load server config file: %v", args.ConfigPath)
 	}
 
-	logger := logger.InitializeLogger()
-	s, err := server.NewServerBootstrap(server.ServerWorld, conf, logger)
+	serv := world.NewWorldServer()
+	if serv == nil {
+		log.Fatal().Msg("Failed to create instance of server")
+	}
+
+	s, err := server.NewBootstrapperWithServer(serv, conf, log)
 	if err != nil {
-		logger.Fatal().Msgf("Failed to create server: %v", err)
+		log.Fatal().Msgf("Failed to create server: %v", err)
 	}
 
 	go func() {
+		log.Info().Msg("Starting server")
 		s.Start()
 	}()
 

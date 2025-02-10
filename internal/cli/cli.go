@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/davidaburns/menethil-core/internal/common/errors"
-	"github.com/davidaburns/menethil-core/internal/common/server"
+	"github.com/davidaburns/menethil-core/internal/errors"
+	"github.com/davidaburns/menethil-core/internal/server"
 )
 
 type CliArguments struct {
