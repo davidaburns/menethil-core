@@ -22,7 +22,9 @@ func NewWorldServer(log *zerolog.Logger, conf *config.Config) *WorldServer {
 	}
 }
 
-func (ws *WorldServer) Start() {}
+func (ws *WorldServer) Start() error {
+	return nil
+}
 
 func (ws *WorldServer) Stop() {}
 

@@ -16,5 +16,6 @@ const (
 	// Database
 	SECTION_DATABASE ConfigSection = "database"
 	DATABASE_DRIVER ConfigKey = "DatabaseDriver"
-	DATABASE_AUTH_DSN ConfigKey = "DatabaseAuthDsn"
+	DATABASE_DSN ConfigKey = "DatabaseDsn"
+	DATABASE_MIGRATION_SRC ConfigKey = "DatabaseMigrationSrc"
 )

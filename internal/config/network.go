@@ -18,7 +18,7 @@ func NetworkConfigFromConfig(c *Config) (NetworkConfig, error) {
 		return NetworkConfig{}, err
 	}
 
-	return NetworkConfig{ListenHost: host, ListenPort: port}, err
+	return NetworkConfig{ListenHost: host, ListenPort: port}, nil
 }
 
 func (c NetworkConfig) GetAddress() string {

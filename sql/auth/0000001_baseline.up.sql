@@ -1,0 +1,241 @@
+
+CREATE TABLE IF NOT EXISTS account_access (
+  id INT NOT NULL,
+  gmlevel SMALLINT NOT NULL,
+  RealmID INT NOT NULL DEFAULT -1,
+  comment NATIONAL CHARACTER VARYING(255) DEFAULT '',
+  PRIMARY KEY (id, RealmID)
+);
+
+CREATE TABLE IF NOT EXISTS account_banned (
+  id INT NOT NULL DEFAULT '0',
+  bandate INT NOT NULL DEFAULT '0',
+  unbandate INT NOT NULL DEFAULT '0',
+  bannedby CHARACTER VARYING(50) NOT NULL,
+  banreason CHARACTER VARYING(255) NOT NULL,
+  active SMALLINT NOT NULL DEFAULT '1',
+
+  PRIMARY KEY (id, bandate)
+);
+
+CREATE TABLE IF NOT EXISTS account_muted (
+  guid int NOT NULL DEFAULT '0',
+  mutedate int NOT NULL DEFAULT '0',
+  mutetime int NOT NULL DEFAULT '0',
+  mutedby CHARACTER VARYING(50) NOT NULL,
+  mutereason CHARACTER VARYING(255) NOT NULL,
+
+  PRIMARY KEY (guid,mutedate)
+);
+
+CREATE TABLE IF NOT EXISTS account (
+  id INT NOT NULL GENERATED ALWAYS AS IDENTITY,
+  username CHARACTER VARYING(32) NOT NULL DEFAULT '',
+  salt CHAR(32) NOT NULL,
+  verifier CHAR(32) NOT NULL,
+  session_key CHAR(40) DEFAULT NULL,
+  totp_secret VARCHAR(128) DEFAULT NULL,
+  email CHARACTER VARYING(255) NOT NULL DEFAULT '',
+  reg_mail CHARACTER VARYING(255) NOT NULL DEFAULT '',
+  joindate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_ip CHARACTER VARYING(15) NOT NULL DEFAULT '127.0.0.1',
+  last_attempt_ip CHARACTER VARYING(15) NOT NULL DEFAULT '127.0.0.1',
+  failed_logins INT NOT NULL DEFAULT 0,
+  locked SMALLINT NOT NULL DEFAULT 0,
+  lock_country CHARACTER VARYING(2) NOT NULL DEFAULT '00',
+  last_login TIMESTAMP NULL DEFAULT NULL,
+  online INT NOT NULL DEFAULT 0,
+  expansion SMALLINT NOT NULL DEFAULT 2,
+  mutetime BIGINT NOT NULL DEFAULT 0,
+  mutereason CHARACTER VARYING(255) NOT NULL DEFAULT '',
+  muteby CHARACTER VARYING(50) NOT NULL DEFAULT '',
+  locale SMALLINT NOT NULL DEFAULT '0',
+  os CHARACTER VARYING(3) NOT NULL DEFAULT '',
+  recruiter INT NOT NULL DEFAULT '0',
+  totaltime INT NOT NULL DEFAULT '0',
+
+  PRIMARY KEY (id),
+  CONSTRAINT idx_username UNIQUE (username)
+);
+
+CREATE TABLE IF NOT EXISTS autobroadcast (
+  realmid INT NOT NULL DEFAULT -1,
+  id SMALLINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+  weight SMALLINT DEFAULT 1,
+  text TEXT NOT NULL,
+
+  PRIMARY KEY (id, realmid)
+);
+
+CREATE TABLE IF NOT EXISTS autobroadcast_locale (
+  realmid INT NOT NULL,
+  id INT NOT NULL,
+  locale CHARACTER VARYING(4) NOT NULL,
+  text CHARACTER VARYING(45) NULL,
+
+  PRIMARY KEY (realmid, id)
+);
+
+CREATE TABLE IF NOT EXISTS build_info (
+  build INT NOT NULL,
+  majorVersion INT DEFAULT NULL,
+  minorVersion INT DEFAULT NULL,
+  bugfixVersion INT DEFAULT NULL,
+  hotfixVersion CHARACTER VARYING(3) DEFAULT NULL,
+  winAuthSeed CHARACTER VARYING(32) DEFAULT NULL,
+  win64AuthSeed CHARACTER VARYING(32) DEFAULT NULL,
+  mac64AuthSeed CHARACTER VARYING(32) DEFAULT NULL,
+  winChecksumSeed CHARACTER VARYING(40) DEFAULT NULL,
+  macChecksumSeed CHARACTER VARYING(40) DEFAULT NULL,
+
+  PRIMARY KEY (build)
+);
+
+CREATE TABLE IF NOT EXISTS ip_banned (
+  ip CHARACTER VARYING(15) NOT NULL DEFAULT '127.0.0.1',
+  bandate INT NOT NULL,
+  unbandate INT NOT NULL,
+  bannedby CHARACTER VARYING(50) NOT NULL DEFAULT '[Console]',
+  banreason CHARACTER VARYING(255) NOT NULL DEFAULT 'no reason',
+
+  PRIMARY KEY (ip, bandate)
+);
+
+CREATE TABLE IF NOT EXISTS logs_ip_actions (
+  id INT NOT NULL GENERATED ALWAYS AS IDENTITY,
+  account_id INT NOT NULL,
+  character_guid INT NOT NULL,
+  type SMALLINT NOT NULL,
+  ip CHARACTER VARYING(15) NOT NULL DEFAULT '127.0.0.1',
+  systemnote TEXT,
+  unixtime INT NOT NULL,
+  time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  comment TEXT,
+
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS logs (
+  time INT NOT NULL,
+  realm INT NOT NULL,
+  type NATIONAL CHARACTER VARYING(250) NOT NULL,
+  level SMALLINT NOT NULL DEFAULT '0',
+  string TEXT
+);
+
+CREATE TABLE IF NOT EXISTS motd_localized (
+  realmid INT NOT NULL,
+  locale CHARACTER VARYING(4) NOT NULL,
+  text TEXT,
+
+  PRIMARY KEY (realmid, locale)
+);
+
+CREATE TABLE IF NOT EXISTS motd (
+  realmid INT NOT NULL,
+  text TEXT,
+
+  PRIMARY KEY (realmid)
+);
+
+CREATE TABLE IF NOT EXISTS realmcharacters (
+  realmid INT NOT NULL DEFAULT 0,
+  acctid INT NOT NULL,
+  numchars SMALLINT NOT NULL DEFAULT 0,
+
+  PRIMARY KEY (realmid, acctid),
+  CONSTRAINT acctid_key UNIQUE (acctid)
+);
+
+CREATE TABLE IF NOT EXISTS realmlist (
+  id INT NOT NULL GENERATED ALWAYS AS IDENTITY,
+  name CHARACTER VARYING(32) NOT NULL DEFAULT '',
+  address CHARACTER VARYING(255) NOT NULL DEFAULT '127.0.0.1',
+  localAddress CHARACTER VARYING(255) NOT NULL DEFAULT '127.0.0.1',
+  localSubnetMask CHARACTER VARYING(255) NOT NULL DEFAULT '255.255.255.0',
+  port SMALLINT  NOT NULL DEFAULT 8085,
+  icon SMALLINT  NOT NULL DEFAULT 0,
+  flag SMALLINT  NOT NULL DEFAULT 2,
+  timezone SMALLINT  NOT NULL DEFAULT 0,
+  allowedSecurityLevel SMALLINT  NOT NULL DEFAULT 0,
+  population FLOAT NOT NULL DEFAULT 0,
+  gamebuild INT  NOT NULL DEFAULT 12340,
+
+  PRIMARY KEY (id),
+  CONSTRAINT idx_name UNIQUE (name),
+  CONSTRAINT realmlist_chk_1 CHECK ((population >= 0))
+);
+
+CREATE TABLE IF NOT EXISTS secret_digest (
+  id INT NOT NULL,
+  digest CHARACTER VARYING(100) NOT NULL,
+
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS uptime (
+  realmid INT NOT NULL,
+  starttime INT NOT NULL DEFAULT '0',
+  uptime INT NOT NULL DEFAULT '0',
+  maxplayers SMALLINT NOT NULL DEFAULT '0',
+  revision CHARACTER VARYING(255) NOT NULL DEFAULT 'MenethilCore',
+
+  PRIMARY KEY (realmid,starttime)
+);
+
+
+-- DEFAULT VALUES
+-- Build Info
+INSERT INTO build_info (
+    build,
+    majorversion,
+    minorversion,
+    bugfixversion,
+    hotfixversion,
+    winauthseed,
+    win64authseed,
+    mac64authseed,
+    winchecksumseed,
+    macchecksumseed
+)
+VALUES
+    (5875,1,12,1,NULL,NULL,NULL,NULL,'95EDB27C7823B363CBDDAB56A392E7CB73FCCA20','8D173CC381961EEBABF336F5E6675B101BB513E5'),
+    (6005,1,12,2,NULL,NULL,NULL,NULL,NULL,NULL),
+    (6141,1,12,3,NULL,NULL,NULL,NULL,NULL,NULL),
+    (8606,2,4,3,NULL,NULL,NULL,NULL,'319AFAA3F2559682F9FF658BE01456255F456FB1','D8B0ECFE534BC1131E19BAD1D4C0E813EEE4994F'),
+    (9947,3,1,3,NULL,NULL,NULL,NULL,NULL,NULL),
+    (10505,3,2,2,'a',NULL,NULL,NULL,NULL,NULL),
+    (11159,3,3,0,'a',NULL,NULL,NULL,NULL,NULL),
+    (11403,3,3,2,NULL,NULL,NULL,NULL,NULL,NULL),
+    (11723,3,3,3,'a',NULL,NULL,NULL,NULL,NULL),
+    (12340,3,3,5,'a',NULL,NULL,NULL,'CDCBBD5188315E6B4D19449D492DBCFAF156A347','B706D13FF2F4018839729461E3F8A0E2B5FDC034'),
+    (13930,3,3,5,'a',NULL,NULL,NULL,NULL,NULL);
+
+-- Default Realm
+INSERT INTO realmlist (
+    name,
+    address,
+    localaddress,
+    localsubnetmask,
+    port,
+    icon,
+    flag,
+    timezone,
+    allowedsecuritylevel,
+    population,
+    gamebuild
+) VALUES
+    ('AzerothCore','127.0.0.1','127.0.0.1','255.255.255.0',8085,0,2,1,0,0,12340);
+
+-- Uptime
+INSERT INTO uptime (
+    realmid,
+    starttime,
+    uptime,
+    maxplayers,
+    revision
+) VALUES
+    (1,1721169877,0,0,'AzerothCore rev. bdf204f1eb0c 2024-07-16 16:28:59 +0000 (time-for-A-SQUASH branch) (Win64, RelWithDebInfo, Static)'),
+    (1,1734468956,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
+    (1,1734470333,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
+    (1,1734471110,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)');

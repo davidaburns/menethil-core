@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/davidaburns/menethil-core/internal/client"
 	"github.com/davidaburns/menethil-core/internal/config"
+	"github.com/davidaburns/menethil-core/internal/database"
 	"github.com/rs/zerolog"
 )
 
@@ -12,6 +14,7 @@ type AuthServer struct {
 	Log *zerolog.Logger
 	Config *config.Config
 	Clients map[string]*client.Client
+	AuthDB *database.DatabaseClient
 }
 
 func NewAuthServer(log *zerolog.Logger, conf *config.Config) *AuthServer {
@@ -19,11 +22,28 @@ func NewAuthServer(log *zerolog.Logger, conf *config.Config) *AuthServer {
 		Log: log,
 		Config: conf,
 		Clients: make(map[string]*client.Client),
+		AuthDB: nil,
 	}
 }
 
-func (as *AuthServer) Start() {
+func (as *AuthServer) Start() error {
 	as.Log.Info().Msg("Initializing auth server")
+	dbConfig, err := config.DatabaseConfigFromConfig(as.Config)
+	if err != nil {
+		return err
+	}
+
+	as.AuthDB, err = database.NewDatabaseClient(dbConfig.Driver, fmt.Sprintf("%v/menethil_auth?sslmode=disable", dbConfig.DSN), as.Log)
+	if err != nil {
+		return err
+	}
+
+	err = as.AuthDB.PerformMigrations(fmt.Sprintf("%v/auth", dbConfig.MigrationSrc))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (as *AuthServer) Stop() {

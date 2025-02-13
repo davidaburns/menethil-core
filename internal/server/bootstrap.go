@@ -9,32 +9,40 @@ import (
 	"github.com/rs/zerolog"
 )
 
-/*
-RESPONSIBILITIES:
-- Setup Logging
-- Setup Process Signals
-- Load Configs?: DAVE: This seems like it should be the responsibilities of the actual server not the bootstrapper
-- Start Listeners?: In order for this to happen we need to load configs
-- Setup Connection Handlers?
-- Create PID File
-- Set Process Afinitiy/Priority
-*/
 type ServerBootstrap struct {
 	Log *zerolog.Logger
 	Config *config.Config
 	Server Server
+	Process *process.SystemProcess
 }
 
 func NewBootstrapperWithServer(server Server, conf *config.Config, log *zerolog.Logger) (*ServerBootstrap, error) {
+	proc,err := process.GetSystemProcess()
+	if err != nil {
+		return nil, err
+	}
+
 	return &ServerBootstrap{
 		Log: log,
 		Config: conf,
 		Server: server,
+		Process: proc,
 	}, nil
 }
 
 func (s *ServerBootstrap) Start() error {
-	s.Server.Start()
+	s.Process.CreatePidFile()
+	s.Process.SetProcessPriority(process.PROCESS_PRIORITY_HIGH)
+	prio, _ := s.Process.GetProcessPriority()
+
+	s.Log.Info().Msgf("Process PID: %v", s.Process.Pid)
+	s.Log.Info().Msgf("Process Priority: %v", prio)
+
+	err := s.Server.Start()
+	if err != nil {
+		return err
+	}
+
 	networkConfig, err := config.NetworkConfigFromConfig(s.Config)
 	if err != nil {
 		return err
@@ -46,7 +54,6 @@ func (s *ServerBootstrap) Start() error {
 	}
 	defer ln.Close()
 
-	process.CreatePIDFile()
 	s.Log.Info().Msgf("Listening on: %v", networkConfig.GetAddress())
 	for {
 		conn, err := ln.Accept()

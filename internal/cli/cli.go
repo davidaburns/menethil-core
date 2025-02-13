@@ -10,6 +10,7 @@ import (
 
 type CliArguments struct {
 	ConfigPath string
+	SqlPath string
 }
 
 func ParseCliArguments(serverType server.ServerType) (*CliArguments, error) {
@@ -19,10 +20,14 @@ func ParseCliArguments(serverType server.ServerType) (*CliArguments, error) {
 	}
 
 	defaultConfigPath := fmt.Sprintf("./conf/%v.config", serverStr)
+	defaultSqlPath := fmt.Sprintf("../sql/%v", serverStr)
+
 	configPath := flag.String("config", defaultConfigPath, "Path to find server config file")
+	sqlPath := flag.String("sql", defaultSqlPath, "Path to find sql files for database migrations")
 
 	flag.Parse()
 	return &CliArguments{
 		ConfigPath: *configPath,
+		SqlPath: *sqlPath,
 	}, nil
 }
