@@ -23,6 +23,5 @@ ListenPort = 3724
 #######################
 [database]
 DatabaseDriver = 'postgres'
-DatabaseWorldDsn = 'postgres://user:password@localhost:5432/menethil_world'
-DatabaseCharacterDsn = 'postgres://user:password@localhost:5432/menethil_character'
-DatabaseRealmDsn = 'postgres://user:password@localhost:5432/menethil_auth'
+DatabaseDsn = 'postgres://exampleuser:examplepassword@localhost:5432'
+DatabaseMigrationSrc = 'file://sql'

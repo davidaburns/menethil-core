@@ -23,4 +23,5 @@ ListenPort = 3724
 #######################
 [database]
 DatabaseDriver = 'postgres'
-DatabaseAuthDsn = 'postgres://user:password@localhost:5432/menethil_auth'
+DatabaseDsn = 'postgres://exampleuser:examplepassword@localhost:5432'
+DatabaseMigrationSrc = 'file://sql'
