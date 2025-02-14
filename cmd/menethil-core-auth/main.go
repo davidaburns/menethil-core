@@ -6,7 +6,6 @@ import (
 	"syscall"
 
 	"github.com/davidaburns/menethil-core/build"
-	"github.com/davidaburns/menethil-core/internal/auth"
 	"github.com/davidaburns/menethil-core/internal/cli"
 	"github.com/davidaburns/menethil-core/internal/config"
 	"github.com/davidaburns/menethil-core/internal/logger"
@@ -32,7 +31,7 @@ func main() {
 		log.Fatal().Msgf("Failed to load server config file: %v: %v", args.ConfigPath, err)
 	}
 
-	serv := auth.NewAuthServer(log, conf)
+	serv := server.NewAuthServer(log, conf)
 	bootstrap, err := server.NewBootstrapperWithServer(serv, conf, log)
 	if err != nil {
 		log.Fatal().Msgf("Failed to bootstrap server: %v", err)

@@ -10,7 +10,6 @@ import (
 	"github.com/davidaburns/menethil-core/internal/config"
 	"github.com/davidaburns/menethil-core/internal/logger"
 	"github.com/davidaburns/menethil-core/internal/server"
-	"github.com/davidaburns/menethil-core/internal/world"
 	"github.com/rs/zerolog"
 )
 
@@ -32,7 +31,7 @@ func main() {
 		log.Fatal().Msgf("Failed to load server config file: %v", args.ConfigPath)
 	}
 
-	serv := world.NewWorldServer(log, conf)
+	serv := server.NewWorldServer(log, conf)
 	if serv == nil {
 		log.Fatal().Msg("Failed to create instance of server")
 	}
