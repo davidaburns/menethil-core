@@ -56,6 +56,8 @@ func (as *AuthServer) Stop() {
 	for _, client := range as.Clients {
 		client.Connection.Close()
 	}
+
+	as.AuthDB.Close()
 }
 
 func (as *AuthServer) HandleConnection(conn net.Conn) {
