@@ -10,7 +10,9 @@ import (
 )
 
 
-func InitializeLogger() *zerolog.Logger {
+func InitializeLogger(level zerolog.Level) *zerolog.Logger {
+	zerolog.SetGlobalLevel(level)
+
 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
 	output.FormatLevel = func(i any) string {
 		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))

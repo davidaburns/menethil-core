@@ -1,0 +1,1 @@
+needed for go:embed to not error out

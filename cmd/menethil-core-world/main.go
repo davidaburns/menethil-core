@@ -11,11 +11,12 @@ import (
 	"github.com/davidaburns/menethil-core/internal/logger"
 	"github.com/davidaburns/menethil-core/internal/server"
 	"github.com/davidaburns/menethil-core/internal/world"
+	"github.com/rs/zerolog"
 )
 
 func main() {
 	serverType := server.ServerWorld
-	log := logger.InitializeLogger()
+	log := logger.InitializeLogger(zerolog.DebugLevel)
 	build := build.NewBuildInfo()
 
 	log.Info().Msgf("Menethil Core: %v Server", serverType.String())

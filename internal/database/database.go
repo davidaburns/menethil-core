@@ -5,28 +5,25 @@ import (
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
-	dbm "github.com/golang-migrate/migrate/v4/database"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/rs/zerolog"
 )
 
-type PreparedStatementId string
-type QueryParser func (rows *sql.Rows) error
-type QueryParseSingle func (row *sql.Row) error
+type QueryParser func(rows *sql.Rows) error
+type QueryParseSingle func(row *sql.Row) error
 
 type DatabaseClient struct {
-	DB *sql.DB
-	DSN string
-	Driver DatabaseDriver
-	Log *zerolog.Logger
-	preparedStatements map[PreparedStatementId]*sql.Stmt
+	DB                 *sql.DB
+	DSN                string
+	Driver             DatabaseDriver
+	Log                *zerolog.Logger
+	preparedStatements map[QueryStatementPath]*sql.Stmt
 }
 
-func NewDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*DatabaseClient, error) {
+func OpenDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*DatabaseClient, error) {
 	log.Info().Msg("Opening database connection")
 	log.Info().Msgf("Database Driver: %v", driver)
-	log.Info().Msgf("Database DSN: %v", dsn)
+	log.Debug().Msgf("Database DSN: %v", dsn)
 
 	db, err := sql.Open(driver, dsn)
 	if err != nil {
@@ -38,15 +35,15 @@ func NewDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*Databas
 	}
 
 	return &DatabaseClient{
-		DB: db,
-		DSN: dsn,
-		Driver: GetDatabaseDriver(driver),
-		Log: log,
-		preparedStatements: make(map[PreparedStatementId]*sql.Stmt),
+		DB:                 db,
+		DSN:                dsn,
+		Driver:             GetDatabaseDriver(driver),
+		Log:                log,
+		preparedStatements: make(map[QueryStatementPath]*sql.Stmt),
 	}, nil
 }
 
-func (db *DatabaseClient) Query(query string, args []any, parser QueryParser) error {
+func (db *DatabaseClient) QueryRaw(query string, args []any, parser QueryParser) error {
 	rows, err := db.DB.Query(query, args...)
 	if err != nil {
 		return err
@@ -60,7 +57,7 @@ func (db *DatabaseClient) Query(query string, args []any, parser QueryParser) er
 	return nil
 }
 
-func (db *DatabaseClient) QuerySingle(query string, args []any, parser QueryParseSingle) error {
+func (db *DatabaseClient) QueryRawSingle(query string, args []any, parser QueryParseSingle) error {
 	row := db.DB.QueryRow(query, args...)
 	err := parser(row)
 	if err != nil {
@@ -70,8 +67,26 @@ func (db *DatabaseClient) QuerySingle(query string, args []any, parser QueryPars
 	return nil
 }
 
-func (db *DatabaseClient) QueryPrepared(id PreparedStatementId, args []any, parser QueryParser) error {
-	stmt := db.preparedStatements[id]
+func (db *DatabaseClient) ExecuteRaw(query string, args []any) (int64, error) {
+	res, err := db.DB.Exec(query, args...)
+	if err != nil {
+		return -1, err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return -1, nil
+	}
+
+	return affected, nil
+}
+
+func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, parser QueryParser) error {
+	stmt, exists := db.preparedStatements[id]
+	if !exists {
+		return fmt.Errorf("The query: %v, has not been prepared", id)
+	}
+
 	rows, err := stmt.Query(args...)
 	if err != nil {
 		return err
@@ -85,8 +100,12 @@ func (db *DatabaseClient) QueryPrepared(id PreparedStatementId, args []any, pars
 	return nil
 }
 
-func (db *DatabaseClient) QueryPreparedSingle(id PreparedStatementId, args []any, parser QueryParseSingle) error {
-	stmt := db.preparedStatements[id]
+func (db *DatabaseClient) QueryPreparedSingle(id QueryStatementPath, args []any, parser QueryParseSingle) error {
+	stmt, exists := db.preparedStatements[id]
+	if !exists {
+		return fmt.Errorf("The query: %v, has not been prepared", id)
+	}
+
 	row := stmt.QueryRow(args...)
 	err := parser(row)
 	if err != nil {
@@ -96,28 +115,65 @@ func (db *DatabaseClient) QueryPreparedSingle(id PreparedStatementId, args []any
 	return nil
 }
 
-func (db *DatabaseClient) PrepareStatement(id PreparedStatementId, query string) error {
+func (db *DatabaseClient) ExecutePrepared(id QueryStatementPath, args []any) (int64, error) {
+	stmt, exists := db.preparedStatements[id]
+	if !exists {
+		return -1, fmt.Errorf("The query: %v, has not been prepared", id)
+	}
+
+	res, err := stmt.Exec(args...)
+	if err != nil {
+		return -1, err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return -1, nil
+	}
+
+	return affected, nil
+}
+
+func (db *DatabaseClient) PrepareStatement(id QueryStatementPath, query string) error {
+	db.Log.Debug().Msgf("Preparing query: %v", id)
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
 
-	db.preparedStatements[id]=stmt
+	db.preparedStatements[id] = stmt
 	return nil
 }
 
-func (db *DatabaseClient) PerformMigrations(src string) error {
-	var driver dbm.Driver
-	var err error
+func (db *DatabaseClient) PrepareEmbeddedQueries(ids []QueryStatementPath) error {
+	db.Log.Info().Msgf("Preparing Queries Count: %v", len(ids))
+	for _, id := range ids {
+		content, err := db.LoadEmbeddedQuery(id)
+		if err != nil {
+			return fmt.Errorf("Failed to load embedded query: %v: %v", id, err)
+		}
 
-	db.Log.Info().Msgf("Creating database migration driver for: %v", db.Driver)
-	switch db.Driver {
-	case DRIVER_POSTGRES:
-		driver, err = postgres.WithInstance(db.DB, &postgres.Config{})
-	default:
-		err = fmt.Errorf("Cannot perform database migrations, driver unkown")
+		err = db.PrepareStatement(id, content)
+		if err != nil {
+			return fmt.Errorf("Failed to prepare query: %v: %v", id, err)
+		}
 	}
 
+	return nil
+}
+
+func (db *DatabaseClient) LoadEmbeddedQuery(id QueryStatementPath) (string, error) {
+	data, err := embeddedQueries.ReadFile(string(id))
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+func (db *DatabaseClient) PerformMigrations(src string) error {
+	db.Log.Info().Msgf("Creating database migration driver for: %v", db.Driver)
+	driver, err := GetDatabaseMigrationDriver(db.DB, db.Driver)
 	if err != nil {
 		return err
 	}

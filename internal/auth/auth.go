@@ -33,12 +33,17 @@ func (as *AuthServer) Start() error {
 		return err
 	}
 
-	as.AuthDB, err = database.NewDatabaseClient(dbConfig.Driver, fmt.Sprintf("%v/menethil_auth?sslmode=disable", dbConfig.DSN), as.Log)
+	as.AuthDB, err = database.OpenDatabaseClient(dbConfig.Driver, fmt.Sprintf("%v/menethil_auth?multiStatements=true", dbConfig.DSN), as.Log)
 	if err != nil {
 		return err
 	}
 
 	err = as.AuthDB.PerformMigrations(fmt.Sprintf("%v/auth", dbConfig.MigrationSrc))
+	if err != nil {
+		return err
+	}
+
+	err = as.AuthDB.PrepareEmbeddedQueries(database.AuthQueries)
 	if err != nil {
 		return err
 	}
