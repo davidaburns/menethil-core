@@ -7,6 +7,7 @@ import (
 	"github.com/davidaburns/menethil-core/internal/client"
 	"github.com/davidaburns/menethil-core/internal/config"
 	"github.com/davidaburns/menethil-core/internal/database"
+	"github.com/davidaburns/menethil-core/internal/realm"
 	"github.com/rs/zerolog"
 )
 
@@ -15,6 +16,7 @@ type AuthServer struct {
 	Config  *config.Config
 	Clients map[string]*client.Client
 	AuthDB  *database.DatabaseClient
+	RealmList *realm.RealmList
 }
 
 func NewAuthServer(log *zerolog.Logger, conf *config.Config) *AuthServer {
@@ -23,6 +25,7 @@ func NewAuthServer(log *zerolog.Logger, conf *config.Config) *AuthServer {
 		Config:  conf,
 		Clients: make(map[string]*client.Client),
 		AuthDB:  nil,
+		RealmList: nil,
 	}
 }
 
@@ -48,6 +51,12 @@ func (as *AuthServer) Start() error {
 		return err
 	}
 
+	as.RealmList, err = realm.NewRealmListFromDb(as.AuthDB, as.Log)
+	if err != nil {
+		return err
+	}
+
+	as.RealmList.ResolveRealms()
 	return nil
 }
 

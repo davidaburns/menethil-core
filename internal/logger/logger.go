@@ -29,6 +29,6 @@ func InitializeLogger(level zerolog.Level) *zerolog.Logger {
 		return fmt.Sprintf("%s", i)
 	}
 
-	logger := zerolog.New(output).With().Timestamp().Logger()
+	logger := zerolog.New(output).With().Caller().Timestamp().Logger()
 	return &logger
 }

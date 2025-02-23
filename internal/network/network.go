@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"time"
 )
 
 type IP struct {
@@ -35,11 +34,10 @@ func (ip *IP) Scan(src any) error {
 }
 
 func (ip *IP) IsResovable() bool {
-	timeout := time.Second * 2
-	conn, err := net.DialTimeout("tcp", ip.String(), timeout)
-	if err != nil {
+	ips, err := net.LookupIP(ip.String())
+	if err != nil || len(ips) == 0 {
 		return false
 	}
-	defer conn.Close()
+
 	return true
 }

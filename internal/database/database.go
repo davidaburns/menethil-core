@@ -44,8 +44,8 @@ func OpenDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*Databa
 	}, nil
 }
 
-func (db *DatabaseClient) QueryRaw(query string, args []any, resultType []any) error {
-	err := db.DB.Select(resultType, query, args...)
+func (db *DatabaseClient) QueryRaw(query string, args []any, dest any) error {
+	err := db.DB.Select(dest, query, args...)
 	if err != nil {
 		return err
 	}
@@ -53,8 +53,8 @@ func (db *DatabaseClient) QueryRaw(query string, args []any, resultType []any) e
 	return err
 }
 
-func (db *DatabaseClient) QueryRawSingle(query string, args []any, resultType any) error {
-	err := db.DB.Get(resultType, query, args...)
+func (db *DatabaseClient) QueryRawSingle(query string, args []any, dest any) error {
+	err := db.DB.Get(dest, query, args...)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (db *DatabaseClient) ExecuteRaw(query string, args []any) (int64, error) {
 	return affected, nil
 }
 
-func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, dest interface{}) error {
+func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, dest any) error {
 	stmt, exists := db.preparedStatements[id]
 	if !exists {
 		return fmt.Errorf("The query: %v, has not been prepared", id)
@@ -90,13 +90,13 @@ func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, dest 
 	return nil
 }
 
-func (db *DatabaseClient) QueryPreparedSingle(id QueryStatementPath, args []any, resultType any) error {
+func (db *DatabaseClient) QueryPreparedSingle(id QueryStatementPath, args []any, dest any) error {
 	stmt, exists := db.preparedStatements[id]
 	if !exists {
 		return fmt.Errorf("The query: %v, has not been prepared", id)
 	}
 
-	err := stmt.Get(resultType, args...)
+	err := stmt.Get(dest, args...)
 	if err != nil {
 		return err
 	}
