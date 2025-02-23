@@ -17,7 +17,6 @@ func NewRealmListFromDb(db *database.DatabaseClient, log *zerolog.Logger) (*Real
 		return nil, err
 	}
 
-
 	realmsMap := make(map[uint32]Realm)
 	for _, realm := range realms {
 		realmsMap[realm.ID] = realm

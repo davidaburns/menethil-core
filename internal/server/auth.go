@@ -12,19 +12,19 @@ import (
 )
 
 type AuthServer struct {
-	Log     *zerolog.Logger
-	Config  *config.Config
-	Clients map[string]*client.Client
-	AuthDB  *database.DatabaseClient
+	Log       *zerolog.Logger
+	Config    *config.Config
+	Clients   map[string]*client.Client
+	AuthDB    *database.DatabaseClient
 	RealmList *realm.RealmList
 }
 
 func NewAuthServer(log *zerolog.Logger, conf *config.Config) *AuthServer {
 	return &AuthServer{
-		Log:     log,
-		Config:  conf,
-		Clients: make(map[string]*client.Client),
-		AuthDB:  nil,
+		Log:       log,
+		Config:    conf,
+		Clients:   make(map[string]*client.Client),
+		AuthDB:    nil,
 		RealmList: nil,
 	}
 }

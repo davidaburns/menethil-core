@@ -1,6 +1,7 @@
 package packets
 
 type AuthResult int
+type AuthCommand int
 type LoginResult int
 type ExpansionFlag int
 
@@ -57,4 +58,17 @@ const (
 	POST_BC_EXP_FLAG  ExpansionFlag = 0x2
 	PRE_BC_EXP_FLAG   ExpansionFlag = 0x1
 	NO_VALID_EXP_FLAG ExpansionFlag = 0x0
+)
+
+const (
+	AUTH_LOGON_CHALLENGE     AuthCommand = 0x00
+	AUTH_LOGON_PROOF         AuthCommand = 0x01
+	AUTH_RECONNECT_CHALLENGE AuthCommand = 0x02
+	AUTH_RECONNECT_PROOF     AuthCommand = 0x03
+	AUTH_REALM_LIST          AuthCommand = 0x10
+	AUTH_XFER_INITIATE       AuthCommand = 0x30
+	AUTH_XFER_DATA           AuthCommand = 0x31
+	AUTH_XFER_ACCEPT         AuthCommand = 0x32
+	AUTH_XFER_RESUME         AuthCommand = 0x33
+	AUTH_XFER_CANCEL         AuthCommand = 0x34
 )
