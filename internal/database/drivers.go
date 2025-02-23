@@ -1,12 +1,12 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 
 	dbm "github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/jmoiron/sqlx"
 )
 
 type DatabaseDriver string
@@ -28,15 +28,15 @@ func GetDatabaseDriver(driver string) DatabaseDriver {
 	}
 }
 
-func GetDatabaseMigrationDriver(db *sql.DB, driver DatabaseDriver) (dbm.Driver, error) {
+func GetDatabaseMigrationDriver(db *sqlx.DB, driver DatabaseDriver) (dbm.Driver, error) {
 	var migrationDriver dbm.Driver
 	var err error
 
 	switch driver {
 	case DRIVER_POSTGRES:
-		migrationDriver, err = postgres.WithInstance(db, &postgres.Config{})
+		migrationDriver, err = postgres.WithInstance(db.DB, &postgres.Config{})
 	case DRIVER_MYSQL:
-		migrationDriver, err = mysql.WithInstance(db, &mysql.Config{})
+		migrationDriver, err = mysql.WithInstance(db.DB, &mysql.Config{})
 	default:
 		err = fmt.Errorf("Cannot create database migration driver, driver unkown")
 	}

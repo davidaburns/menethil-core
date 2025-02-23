@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/zerolog"
 )
 
@@ -13,11 +14,11 @@ type QueryParser func(rows *sql.Rows) error
 type QueryParseSingle func(row *sql.Row) error
 
 type DatabaseClient struct {
-	DB                 *sql.DB
+	DB                 *sqlx.DB
 	DSN                string
 	Driver             DatabaseDriver
 	Log                *zerolog.Logger
-	preparedStatements map[QueryStatementPath]*sql.Stmt
+	preparedStatements map[QueryStatementPath]*sqlx.Stmt
 }
 
 func OpenDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*DatabaseClient, error) {
@@ -25,7 +26,7 @@ func OpenDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*Databa
 	log.Info().Msgf("Database Driver: %v", driver)
 	log.Debug().Msgf("Database DSN: %v", dsn)
 
-	db, err := sql.Open(driver, dsn)
+	db, err := sqlx.Open(driver, dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -39,27 +40,21 @@ func OpenDatabaseClient(driver string, dsn string, log *zerolog.Logger) (*Databa
 		DSN:                dsn,
 		Driver:             GetDatabaseDriver(driver),
 		Log:                log,
-		preparedStatements: make(map[QueryStatementPath]*sql.Stmt),
+		preparedStatements: make(map[QueryStatementPath]*sqlx.Stmt),
 	}, nil
 }
 
-func (db *DatabaseClient) QueryRaw(query string, args []any, parser QueryParser) error {
-	rows, err := db.DB.Query(query, args...)
+func (db *DatabaseClient) QueryRaw(query string, args []any, resultType []any) error {
+	err := db.DB.Select(resultType, query, args...)
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
 
-	if err := parser(rows); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (db *DatabaseClient) QueryRawSingle(query string, args []any, parser QueryParseSingle) error {
-	row := db.DB.QueryRow(query, args...)
-	err := parser(row)
+func (db *DatabaseClient) QueryRawSingle(query string, args []any, resultType any) error {
+	err := db.DB.Get(resultType, query, args...)
 	if err != nil {
 		return err
 	}
@@ -75,39 +70,33 @@ func (db *DatabaseClient) ExecuteRaw(query string, args []any) (int64, error) {
 
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return -1, nil
+		return -1, err
 	}
 
 	return affected, nil
 }
 
-func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, parser QueryParser) error {
+func (db *DatabaseClient) QueryPrepared(id QueryStatementPath, args []any, dest interface{}) error {
 	stmt, exists := db.preparedStatements[id]
 	if !exists {
 		return fmt.Errorf("The query: %v, has not been prepared", id)
 	}
 
-	rows, err := stmt.Query(args...)
+	err := stmt.Select(dest, args...)
 	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	if err := parser(rows); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (db *DatabaseClient) QueryPreparedSingle(id QueryStatementPath, args []any, parser QueryParseSingle) error {
+func (db *DatabaseClient) QueryPreparedSingle(id QueryStatementPath, args []any, resultType any) error {
 	stmt, exists := db.preparedStatements[id]
 	if !exists {
 		return fmt.Errorf("The query: %v, has not been prepared", id)
 	}
 
-	row := stmt.QueryRow(args...)
-	err := parser(row)
+	err := stmt.Get(resultType, args...)
 	if err != nil {
 		return err
 	}
@@ -136,7 +125,7 @@ func (db *DatabaseClient) ExecutePrepared(id QueryStatementPath, args []any) (in
 
 func (db *DatabaseClient) PrepareStatement(id QueryStatementPath, query string) error {
 	db.Log.Debug().Msgf("Preparing query: %v", id)
-	stmt, err := db.DB.Prepare(query)
+	stmt, err := db.DB.Preparex(query)
 	if err != nil {
 		return err
 	}
