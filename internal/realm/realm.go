@@ -1,27 +1,21 @@
 package realm
 
 import (
-	"database/sql"
-
 	"github.com/davidaburns/menethil-core/internal/account"
+	"github.com/davidaburns/menethil-core/internal/network"
 )
 
 type Realm struct {
-	ID                   uint32
-	Build                uint32
-	ExternalAddress      string
-	LocalAddress         string
-	LocalSubnetMask      string
-	Port                 uint16
-	Name                 string
-	Type                 RealmType
-	Flags                RealmFlag
-	Timezone             uint8
-	AllowedSecurityLevel account.AccountType
-	PopulationLevel      float32
-}
-
-func RealmFromSqlRow(row *sql.Row) (*Realm, error) {
-	var realm *Realm
-	return realm, nil
+	ID                   uint32              `db:"id"`
+	Build                uint32              `db:"gamebuild"`
+	ExternalAddress      network.IP          `db:"address"`
+	LocalAddress         network.IP          `db:"localAddress"`
+	LocalSubnetMask      string              `db:"localSubnetMask"`
+	Port                 uint16              `db:"port"`
+	Name                 string              `db:"name"`
+	Type                 RealmType           `db:"icon"`
+	Flags                RealmFlag           `db:"flag"`
+	Timezone             uint8               `db:"timezone"`
+	AllowedSecurityLevel account.AccountType `db:"allowedSecurityLevel"`
+	PopulationLevel      float32             `db:"population"`
 }

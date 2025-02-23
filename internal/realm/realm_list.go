@@ -1,11 +1,12 @@
 package realm
 
-import "github.com/davidaburns/menethil-core/internal/database"
+import "github.com/rs/zerolog"
 
 type RealmList struct {
 	Realms map[uint32]Realm
+	Log    *zerolog.Logger
 }
 
-func GetRealmListFromDb(db *database.DatabaseClient) (*RealmList, error) {
-	return nil, nil
+func NewRealmList(log *zerolog.Logger) *RealmList {
+	return &RealmList{Realms: map[uint32]Realm{}, Log: log}
 }
