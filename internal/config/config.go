@@ -8,7 +8,6 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-
 type Config struct {
 	handle *ini.File
 }

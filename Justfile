@@ -17,13 +17,17 @@ build type="dev" platform="darwin":
 		exit 1; \
 	fi
 
-run type="dev" platform="darwin" app="world" +args="":
+run type="dev" platform="darwin" app="auth" +args="":
 	@just build {{type}}
 	@./bin/{{name}}-{{app}} {{args}}
 
 test:
 	@echo "Running Tests..."
 	@go test ./...
+
+fmt:
+    @echo "Formatting files..."
+    @go fmt ./...
 
 lint:
 	@echo "Linting..."

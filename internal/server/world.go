@@ -9,15 +9,15 @@ import (
 )
 
 type WorldServer struct {
-	Log *zerolog.Logger
-	Config *config.Config
+	Log     *zerolog.Logger
+	Config  *config.Config
 	Clients map[string]*client.Client
 }
 
 func NewWorldServer(log *zerolog.Logger, conf *config.Config) *WorldServer {
 	return &WorldServer{
-		Log: log,
-		Config: conf,
+		Log:     log,
+		Config:  conf,
 		Clients: make(map[string]*client.Client),
 	}
 }

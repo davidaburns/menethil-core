@@ -6,5 +6,5 @@ const (
 
 	// Config Errors
 	ConfigSectionNotFound = "Config Section Not Found"
-	ConfigKeyNotFound = "Config Key Not Found"
+	ConfigKeyNotFound     = "Config Key Not Found"
 )

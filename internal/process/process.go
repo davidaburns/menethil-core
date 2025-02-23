@@ -8,14 +8,15 @@ import (
 )
 
 type ProcessPriority int
+
 const (
-	PROCESS_PRIORITY_HIGH ProcessPriority = 0
+	PROCESS_PRIORITY_HIGH   ProcessPriority = 0
 	PROCESS_PRIORITY_MEDIUM ProcessPriority = 10
-	PROCESS_PRIORITY_LOW ProcessPriority = 20
+	PROCESS_PRIORITY_LOW    ProcessPriority = 20
 )
 
 type SystemProcess struct {
-	Pid int
+	Pid  int
 	Path string
 }
 
@@ -26,12 +27,12 @@ func GetSystemProcess() (*SystemProcess, error) {
 	}
 
 	return &SystemProcess{
-		Pid: os.Getpid(),
+		Pid:  os.Getpid(),
 		Path: exePath,
 	}, nil
 }
 
-func (sp *SystemProcess) GetProcessPriority()(int, error) {
+func (sp *SystemProcess) GetProcessPriority() (int, error) {
 	prio, err := syscall.Getpriority(syscall.PRIO_PROCESS, sp.Pid)
 	if err != nil {
 		return -1, err

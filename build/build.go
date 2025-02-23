@@ -3,34 +3,34 @@ package build
 import "fmt"
 
 var (
-	name = "menethil-core"
-	version = "0.0.1"
+	name        = "menethil-core"
+	version     = "0.0.1"
 	buildNumber = "0"
-	buildTime = ""
-	buildType = ""
+	buildTime   = ""
+	buildType   = ""
 )
 
 const (
-	BuildTypeDev string = "dev"
+	BuildTypeDev  string = "dev"
 	BuildTypeProd string = "prod"
 )
 
 type BuildInfo struct {
-	Name string
-	Version string
+	Name        string
+	Version     string
 	BuildNumber string
-	BuildTime string
-	BuildType string
+	BuildTime   string
+	BuildType   string
 	BuildCommit string
 }
 
 func NewBuildInfo() *BuildInfo {
-	return &BuildInfo {
-		Name: name,
-		Version: version,
+	return &BuildInfo{
+		Name:        name,
+		Version:     version,
 		BuildNumber: buildNumber,
-		BuildTime: buildTime,
-		BuildType: buildType,
+		BuildTime:   buildTime,
+		BuildType:   buildType,
 	}
 }
 

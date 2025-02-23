@@ -65,7 +65,7 @@ const (
 	AUTH_SELECT_ACCOUNT_WHOIS                    QueryStatementPath = "queries/auth/select_account_whois.sql"
 	AUTH_SELECT_AUTOBROADCAST_LOCALIZED          QueryStatementPath = "queries/auth/select_autobroadcast_localized.sql"
 	AUTH_SELECT_AUTOBROADCAST                    QueryStatementPath = "queries/auth/select_autobroadcast.sql"
-	AUTH_SELECT_BUILD_INFO                    QueryStatementPath = "queries/auth/select_build_info.sql"
+	AUTH_SELECT_BUILD_INFO                       QueryStatementPath = "queries/auth/select_build_info.sql"
 	AUTH_SELECT_FAILED_LOGINS                    QueryStatementPath = "queries/auth/select_failed_logins.sql"
 	AUTH_SELECT_GMLEVEL_BY_REALMID               QueryStatementPath = "queries/auth/select_gmlevel_by_realmid.sql"
 	AUTH_SELECT_IP_BANNED_ALL                    QueryStatementPath = "queries/auth/select_ip_banned_all.sql"
@@ -101,7 +101,7 @@ const (
 	AUTH_UPDATE_USERNAME                         QueryStatementPath = "queries/auth/delete_account_access_by_realm.sql"
 )
 
-var AuthQueries []QueryStatementPath = []QueryStatementPath {
+var AuthQueries []QueryStatementPath = []QueryStatementPath{
 	AUTH_DELETE_ACCOUNT_ACCESS_BY_REALM,
 	AUTH_DELETE_ACCOUNT_ACCESS,
 	AUTH_DELETE_ACCOUNT_BANNED,

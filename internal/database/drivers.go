@@ -13,15 +13,18 @@ type DatabaseDriver string
 
 const (
 	DRIVER_POSTGRES DatabaseDriver = "postgres"
-	DRIVER_MYSQL DatabaseDriver = "mysql"
-	DRIVER_UNKNOWN DatabaseDriver = "unknown"
+	DRIVER_MYSQL    DatabaseDriver = "mysql"
+	DRIVER_UNKNOWN  DatabaseDriver = "unknown"
 )
 
 func GetDatabaseDriver(driver string) DatabaseDriver {
 	switch driver {
-	case "postgres": return DRIVER_POSTGRES
-	case "mysql": return DRIVER_MYSQL
-	default: return DRIVER_UNKNOWN
+	case "postgres":
+		return DRIVER_POSTGRES
+	case "mysql":
+		return DRIVER_MYSQL
+	default:
+		return DRIVER_UNKNOWN
 	}
 }
 

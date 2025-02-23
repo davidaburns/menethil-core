@@ -9,12 +9,12 @@ import (
 
 type PeriodicJob struct {
 	Ticker time.Ticker
-	Job func()
+	Job    func()
 	Cancel context.CancelFunc
 }
 
 type PeriodicJobManager struct {
-	mu sync.Mutex
+	mu   sync.Mutex
 	Jobs map[string]*PeriodicJob
 }
 
@@ -34,7 +34,7 @@ func (jm *PeriodicJobManager) StartJob(name string, intervalSec float32, job fun
 	ctx, cancel := context.WithCancel(context.Background())
 	pj := &PeriodicJob{
 		Ticker: *time.NewTicker(time.Second * time.Duration(intervalSec)),
-		Job: job,
+		Job:    job,
 		Cancel: cancel,
 	}
 
@@ -50,7 +50,7 @@ func (jm *PeriodicJobManager) StartJob(name string, intervalSec float32, job fun
 		}
 	}()
 
-	jm.Jobs[name]=pj
+	jm.Jobs[name] = pj
 	jm.mu.Unlock()
 }
 

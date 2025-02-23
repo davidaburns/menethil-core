@@ -9,7 +9,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-
 func InitializeLogger(level zerolog.Level) *zerolog.Logger {
 	zerolog.SetGlobalLevel(level)
 

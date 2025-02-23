@@ -1,8 +1,8 @@
 package config
 
 type DatabaseConfig struct {
-	Driver string `ini:"DatabaseDriver"`
-	DSN string `ini:"DatabaseDsn"`
+	Driver       string `ini:"DatabaseDriver"`
+	DSN          string `ini:"DatabaseDsn"`
 	MigrationSrc string `ini:"DatabaseMigratioSrc"`
 }
 
@@ -23,8 +23,8 @@ func DatabaseConfigFromConfig(c *Config) (DatabaseConfig, error) {
 	}
 
 	return DatabaseConfig{
-		Driver: driver,
-		DSN: dsn,
+		Driver:       driver,
+		DSN:          dsn,
 		MigrationSrc: migrationSrc,
 	}, nil
 }

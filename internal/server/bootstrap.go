@@ -10,22 +10,22 @@ import (
 )
 
 type ServerBootstrap struct {
-	Log *zerolog.Logger
-	Config *config.Config
-	Server Server
+	Log     *zerolog.Logger
+	Config  *config.Config
+	Server  Server
 	Process *process.SystemProcess
 }
 
 func NewBootstrapperWithServer(server Server, conf *config.Config, log *zerolog.Logger) (*ServerBootstrap, error) {
-	proc,err := process.GetSystemProcess()
+	proc, err := process.GetSystemProcess()
 	if err != nil {
 		return nil, err
 	}
 
 	return &ServerBootstrap{
-		Log: log,
-		Config: conf,
-		Server: server,
+		Log:     log,
+		Config:  conf,
+		Server:  server,
 		Process: proc,
 	}, nil
 }

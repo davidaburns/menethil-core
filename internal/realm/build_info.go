@@ -7,18 +7,18 @@ import (
 )
 
 type BuildInfo struct {
-	Build uint32
-	MajorVersion uint32
-	MinorVersion uint32
+	Build         uint32
+	MajorVersion  uint32
+	MinorVersion  uint32
 	BugfixVersion uint32
 	HotfixVersion []rune
-	WindowsHash []uint8
-	MacHash []uint8
+	WindowsHash   []uint8
+	MacHash       []uint8
 }
 
 func GetBuildInfoFromDb(build uint32, db *database.DatabaseClient) (*BuildInfo, error) {
 	var buildInfo *BuildInfo
-	parser  := func(row *sql.Row) error {
+	parser := func(row *sql.Row) error {
 		err := row.Scan(
 			&buildInfo.MajorVersion,
 			&buildInfo.MinorVersion,
@@ -33,11 +33,10 @@ func GetBuildInfoFromDb(build uint32, db *database.DatabaseClient) (*BuildInfo, 
 			return err
 		}
 
-
 		return nil
 	}
 
-	if err := db.QueryPreparedSingle(database.AUTH_SELECT_BUILD_INFO, []any {build}, parser); err != nil {
+	if err := db.QueryPreparedSingle(database.AUTH_SELECT_BUILD_INFO, []any{build}, parser); err != nil {
 		return nil, err
 	}
 

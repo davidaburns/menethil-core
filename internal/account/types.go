@@ -1,6 +1,7 @@
 package account
 
 type AccountType uint8
+
 const (
 	ACCOUNT_TYPE_SEC_PLAYER AccountType = iota
 	ACCOUNT_TYPE_SEC_MODERATOR
