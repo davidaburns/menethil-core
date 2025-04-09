@@ -15,7 +15,7 @@ type CliArguments struct {
 func ParseCliArguments(serverType server.ServerType) (*CliArguments, error) {
 	serverStr := serverType.StringShort()
 	if serverStr == "unkown" {
-		return nil, fmt.Errorf("Error parsing cli arguments: %v", errors.ServerTypeUnkown)
+		return nil, fmt.Errorf("Error parsing cli arguments: %v", errors.ErrServerTypeUnkown)
 	}
 
 	defaultConfigPath := fmt.Sprintf("./conf/%v.config", serverStr)

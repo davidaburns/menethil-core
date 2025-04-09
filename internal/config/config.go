@@ -33,12 +33,12 @@ func GetValue[T ConfigSupportedValueTypes](c *Config, section ConfigSection, key
 	keyStr := string(key)
 
 	if !c.handle.HasSection(sectionStr) {
-		return zero, fmt.Errorf("%v: %v", errors.ConfigSectionNotFound, sectionStr)
+		return zero, fmt.Errorf("%v: %v", errors.ErrConfigSectionNotFound, sectionStr)
 	}
 
 	sec := c.handle.Section(sectionStr)
 	if !sec.HasKey(keyStr) {
-		return zero, fmt.Errorf("%v: %v", errors.ConfigKeyNotFound, keyStr)
+		return zero, fmt.Errorf("%v: %v", errors.ErrConfigKeyNotFound, keyStr)
 	}
 
 	str := sec.Key(keyStr).String()

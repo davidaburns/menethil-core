@@ -1,10 +1,18 @@
 package errors
 
-const (
+import err "errors"
+
+var (
 	// Server Errors
-	ServerTypeUnkown = "Unkown Server Type"
+	ErrServerTypeUnkown = err.New("unkown server type")
 
 	// Config Errors
-	ConfigSectionNotFound = "Config Section Not Found"
-	ConfigKeyNotFound     = "Config Key Not Found"
+	ErrConfigSectionNotFound = err.New("config section not found")
+	ErrConfigKeyNotFound     = err.New("config key not found")
+
+	// Crypto Errors
+	ErrCryptoNotInitialized = err.New("crypto has not been initialized")
+
+	// Header Errors
+	ErrHeaderSizeTooLarge = err.New("header size is too large")
 )
